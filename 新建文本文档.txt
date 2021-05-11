@@ -1,1 +1,19 @@
-11111
+ size_t textureSize = m_Ctx.CurGLPipelineState()->textures.size();
+  std::vector<ResourceId> textureIdList;
+  for(size_t textureIndex = 0; textureIndex < textureSize; textureIndex++) {
+    ResourceId textureId = m_Ctx.CurGLPipelineState()->textures[textureIndex].resourceId;
+    if(textureId == ResourceId()) {
+      continue;
+    } else {
+      textureIdList.push_back(textureId);
+    }        
+    m_Ctx.Replay().AsyncInvoke([this, textureId](IReplayController *r) {
+      rdcarray<EventUsage> usage = r->GetUsage(textureId);
+      GUIInvoke::call(this, [this, usage]() {
+        for(const EventUsage &u : usage)
+          m_UsageEvents << u;
+      });
+    });
+  }
+  std::sort(m_UsageEvents.begin(), m_UsageEvents.end());
+  
