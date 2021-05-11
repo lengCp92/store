@@ -16,8 +16,12 @@ auto *pipe = m_Ctx.CurGLPipelineState();
       rdcarray<EventUsage> usage = r->GetUsage(textureId);
       GUIInvoke::call(this, [this, usage]() {
         m_UsageEvents.clear();
-        for(const EventUsage &u : usage)
-          m_UsageEvents << u;
+        for(const EventUsage &u : usage){
+		  if(u.usage == ResourceUsage::ColorTarget)
+          {
+            m_UsageEvents << u;
+          }
+		}
       });
     });
   }
